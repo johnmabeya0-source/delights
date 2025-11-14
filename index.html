@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>QuickBite Delights - Food Delivery</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Order food online from your favorite restaurants"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: #1a1a1a;
+        color: #ffffff;
+        line-height: 1.6;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Background with blurred restaurant image */
+      .background-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+      }
+
+      .background-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(8px) brightness(0.4);
+        transform: scale(1.1);
+      }
+
+      /* Login Page Styles */
+      .login-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.7);
+      }
+
+      .login-container {
+        background: rgba(42, 42, 42, 0.95);
+        padding: 50px;
+        border-radius: 20px;
+        border: 3px solid #ff6b00;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      }
+
+      .login-logo {
+        font-size: 3.5em;
+        margin-bottom: 20px;
+      }
+
+      .login-title {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        color: #ff6b00;
+      }
+
+      .login-subtitle {
+        font-size: 1.2em;
+        margin-bottom: 40px;
+        color: #cccccc;
+      }
+
+      /* Main App (Hidden until login) */
+      .main-app {
+        display: none;
+      }
+
+      /* Header Styles */
+      .header {
+        background: linear-gradient(135deg, #ff6b00, #ff8e00);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+        border-bottom: 3px solid #333;
+        position: relative;
+      }
+
+      .header h1 {
+        font-size: 2.8em;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        letter-spacing: 1px;
+      }
+
+      .header p {
+        font-size: 1.2em;
+        margin-top: 10px;
+        opacity: 0.9;
+      }
+
+      /* Navigation Bar */
+      .navbar {
+        background: #2a2a2a;
+        padding: 15px 0;
+        border-bottom: 2px solid #ff6b00;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+      }
+
+      .nav-link {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 8px 16px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover {
+        background: #ff6b00;
+        color: #1a1a1a;
+      }
+
+      .user-info {
+        color: #ff6b00;
+        font-weight: bold;
+        padding: 8px 16px;
+      }
+
+      .logout-btn {
+        background: #333;
+        color: #ff6b00;
+        border: 1px solid #ff6b00;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+      }
+
+      .logout-btn:hover {
+        background: #ff6b00;
+        color: white;
+      }
+
+      .cart-icon {
+        position: relative;
+        cursor: pointer;
+        font-size: 1.2em;
+        padding: 8px 16px;
+        background: #333;
+        border-radius: 5px;
+        border: 1px solid #ff6b00;
+      }
+
+      .cart-count {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff6b00;
+        color: #1a1a1a;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.8em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+
+      /* Main Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+      }
+
+      /* Controls */
+      .controls {
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .btn {
+        background: #ff6b00;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        margin: 0 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        border: 2px solid #333;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn:hover {
+        background: #ff8e00;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
+      }
+
+      .btn-secondary {
+        background: #333;
+        color: #ff6b00;
+        border: 2px solid #ff6b00;
+      }
+
+      .btn-secondary:hover {
+        background: #ff6b00;
+        color: white;
+      }
+
+      .btn-small {
+        padding: 8px 15px;
+        font-size: 0.9em;
+        margin: 0 5px;
+      }
+
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+        border: 2px solid #dc3545;
+      }
+
+      .btn-danger:hover {
+        background: #c82333;
+        border-color: #c82333;
+      }
+
+      /* Messages */
+      .message {
+        padding: 20px;
+        background: #333;
+        border: 2px solid #ff6b00;
+        border-radius: 10px;
+        text-align: center;
+        margin: 20px 0;
+        color: #ff6b00;
+        font-weight: bold;
+      }
+
+      .message.success {
+        background: #1a3331;
+        border-color: #4caf50;
+        color: #4caf50;
+      }
+
+      .message.error {
+        background: #332a2a;
+        border-color: #ff6b6b;
+        color: #ff6b6b;
+      }
+
+      /* Restaurants Grid */
+      .restaurants {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .restaurant-card {
+        background: #2a2a2a;
+        padding: 0;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        border: 2px solid #333;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .restaurant-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b00, #ff8e00);
+      }
+
+      .restaurant-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(255, 107, 0, 0.2);
+        border-color: #ff6b00;
+      }
+
+      .restaurant-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-bottom: 2px solid #333;
+      }
+
+      .restaurant-content {
+        padding: 25px;
+      }
+
+      .restaurant-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+      }
+
+      .restaurant-card h3 {
+        color: #ffffff;
+        margin: 0;
+        font-size: 1.6em;
+        font-weight: bold;
+      }
+
+      .cuisine {
+        background: #ff6b00;
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .description {
+        color: #cccccc;
+        margin-bottom: 20px;
+        line-height: 1.6;
+        font-size: 1em;
+      }
+
+      .restaurant-details {
+        margin-bottom: 25px;
+      }
+
+      .details {
+        color: #aaaaaa;
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .rating {
+        color: #ffd700;
+        font-weight: bold;
+      }
+
+      .btn-order {
+        width: 100%;
+        padding: 15px;
+        background: #333;
+        color: #ff6b00;
+        border: 2px solid #ff6b00;
+        border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-order:hover {
+        background: #ff6b00;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .btn-order.logged-in {
+        background: #ff6b00;
+        color: white;
+      }
+
+      /* Cart Modal */
+      .cart-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .cart-content {
+        background: #2a2a2a;
+        padding: 30px;
+        border-radius: 15px;
+        border: 3px solid #ff6b00;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ff6b00;
+        padding-bottom: 15px;
+      }
+
+      .close-cart {
+        background: none;
+        border: none;
+        color: #ff6b00;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .cart-items {
+        margin-bottom: 20px;
+      }
+
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #333;
+      }
+
+      .cart-item-info {
+        flex: 1;
+      }
+
+      .cart-item-name {
+        font-weight: bold;
+        color: #ffffff;
+        margin-bottom: 5px;
+      }
+
+      .cart-item-price {
+        color: #ff6b00;
+        font-weight: bold;
+      }
+
+      .cart-item-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #333;
+        padding: 5px;
+        border-radius: 5px;
+      }
+
+      .quantity-btn {
+        background: #ff6b00;
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .quantity-btn:hover {
+        background: #ff8e00;
+      }
+
+      .quantity-display {
+        color: white;
+        font-weight: bold;
+        min-width: 20px;
+        text-align: center;
+      }
+
+      .remove-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+      }
+
+      .remove-btn:hover {
+        background: #c82333;
+      }
+
+      .cart-total {
+        text-align: right;
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #ff6b00;
+        margin: 20px 0;
+        border-top: 2px solid #333;
+        padding-top: 15px;
+      }
+
+      .empty-cart {
+        text-align: center;
+        color: #cccccc;
+        padding: 40px 20px;
+      }
+
+      /* Checkout Modal */
+      .checkout-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .checkout-content {
+        background: #2a2a2a;
+        padding: 40px;
+        border-radius: 15px;
+        border: 3px solid #ff6b00;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .checkout-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #ff6b00;
+        padding-bottom: 15px;
+      }
+
+      .payment-method {
+        background: #333;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        border: 2px solid #ff6b00;
+      }
+
+      .mpesa-number {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #ff6b00;
+        text-align: center;
+        margin: 15px 0;
+        padding: 10px;
+        background: #1a1a1a;
+        border-radius: 5px;
+      }
+
+      .payment-steps {
+        margin: 20px 0;
+        padding: 15px;
+        background: #333;
+        border-radius: 10px;
+      }
+
+      .payment-steps ol {
+        margin-left: 20px;
+        color: #cccccc;
+      }
+
+      .payment-steps li {
+        margin: 10px 0;
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #cccccc;
+        font-weight: bold;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        background: #333;
+        border: 2px solid #444;
+        border-radius: 8px;
+        color: white;
+        font-size: 1em;
+      }
+
+      .form-group input:focus {
+        border-color: #ff6b00;
+        outline: none;
+      }
+
+      /* Footer */
+      .footer {
+        background: #2a2a2a;
+        color: #cccccc;
+        text-align: center;
+        padding: 30px 20px;
+        margin-top: 50px;
+        border-top: 3px solid #ff6b00;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2.2em;
+        }
+
+        .nav-container {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .nav-links {
+          gap: 15px;
+        }
+
+        .restaurants {
+          grid-template-columns: 1fr;
+        }
+
+        .controls {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .btn {
+          margin: 5px 0;
+          width: 100%;
+          max-width: 300px;
+        }
+
+        .login-container {
+          padding: 30px 20px;
+        }
+
+        .login-title {
+          font-size: 2em;
+        }
+
+        .cart-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .cart-item-controls {
+          width: 100%;
+          justify-content: space-between;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background Image -->
+    <div class="background-container">
+      <img
+        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&h=1080&fit=crop"
+        alt="Restaurant Background"
+        class="background-image"
+      />
+    </div>
+
+    <!-- Login Page -->
+    <div class="login-page" id="login-page">
+      <div class="login-container">
+        <div class="login-logo">🍕</div>
+        <h1 class="login-title">QuickBite Delights</h1>
+        <p class="login-subtitle">Login to start ordering delicious food</p>
+
+        <div class="form-group">
+          <input
+            type="email"
+            id="initial-email"
+            placeholder="Enter your email"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="password"
+            id="initial-password"
+            placeholder="Enter your password"
+            class="form-input"
+          />
+        </div>
+        <button
+          class="btn"
+          onclick="initialLogin()"
+          style="width: 100%; margin: 20px 0"
+        >
+          Login to QuickBite
+        </button>
+        <p style="color: #cccccc; margin-top: 20px">
+          Don't have an account? Just enter any email and password to register
+        </p>
+      </div>
+    </div>
+
+    <!-- Main App (Hidden until login) -->
+    <div class="main-app" id="main-app">
+      <!-- Header -->
+      <div class="header">
+        <h1>🍕 QuickBite Delights</h1>
+        <p>Order your favorite food online!</p>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="navbar">
+        <div class="nav-container">
+          <div class="nav-links">
+            <span id="user-greeting">
+              <span class="user-info" id="user-name"></span>
+              <button class="logout-btn" onclick="logout()">Logout</button>
+            </span>
+            <a href="#" class="nav-link" onclick="loadRestaurants()"
+              >Restaurants</a
+            >
+          </div>
+          <div class="cart-icon" onclick="showCart()">
+            🛒 Cart <span class="cart-count" id="cart-count">0</span>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="container">
+        <div class="controls">
+          <button class="btn" onclick="loadRestaurants()">
+            Refresh Restaurants
+          </button>
+          <button class="btn btn-secondary" onclick="showCart()">
+            View Cart (<span id="cart-count-nav">0</span>)
+          </button>
+        </div>
+
+        <div id="message"></div>
+
+        <div id="restaurants" class="restaurants"></div>
+      </div>
+
+      <!-- Cart Modal -->
+      <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+          <div class="cart-header">
+            <h2>🛒 Your Cart</h2>
+            <button class="close-cart" onclick="hideCart()">✕</button>
+          </div>
+          <div class="cart-items" id="cart-items">
+            <!-- Cart items will be populated here -->
+          </div>
+          <div class="cart-total" id="cart-total">Total: $0.00</div>
+          <div style="display: flex; gap: 10px">
+            <button
+              class="btn btn-secondary"
+              onclick="clearCart()"
+              style="flex: 1"
+            >
+              🗑️ Clear Cart
+            </button>
+            <button class="btn" onclick="showCheckout()" style="flex: 2">
+              💰 Proceed to Checkout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checkout Modal -->
+      <div class="checkout-modal" id="checkout-modal">
+        <div class="checkout-content">
+          <div class="checkout-header">
+            <h2>💰 Checkout</h2>
+            <button class="close-cart" onclick="hideCheckout()">✕</button>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Your Email for Order Receipt:</label>
+            <input
+              type="email"
+              id="confirm-email"
+              placeholder="Enter your email for confirmation"
+            />
+          </div>
+
+          <div class="payment-method">
+            <h3>📱 M-Pesa Payment</h3>
+            <p style="text-align: center; margin: 15px 0; color: #cccccc">
+              Send payment to our business number:
+            </p>
+            <div class="mpesa-number" id="mpesa-number">2547 123 456 789</div>
+            <p style="text-align: center; color: #ff6b00; font-weight: bold">
+              Pochi la Biashara: QUICKBITE DELIGHTS
+            </p>
+          </div>
+
+          <div class="payment-steps">
+            <h4>Payment Instructions:</h4>
+            <ol>
+              <li>Go to M-Pesa on your phone</li>
+              <li>Select "Lipa Na M-Pesa"</li>
+              <li>Select "Buy Goods and Services"</li>
+              <li>Enter Till Number: <strong>123456</strong></li>
+              <li>Enter amount: <strong id="payment-amount">$0.00</strong></li>
+              <li>Enter your M-Pesa PIN</li>
+              <li>Click "Send" to complete payment</li>
+            </ol>
+          </div>
+
+          <button class="btn" onclick="completeOrder()" style="width: 100%">
+            ✅ Confirm Order & Payment
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>&copy; 2024 QuickBite Delights. All rights reserved.</p>
+        <p>Fast delivery • Fresh food • Great prices</p>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      const API_URL = "http://localhost:5000/api";
+      let cart = [];
+      let currentUser = null;
+      const displayedRestaurants = new Set();
+
+      // Restaurant menu items
+      const restaurantMenus = {
+        1: [
+          // Mario's Pizza Palace
+          { name: "Margherita Pizza", price: 16.99 },
+          { name: "Pepperoni Pizza", price: 18.99 },
+          { name: "Vegetarian Pizza", price: 17.99 },
+          { name: "Garlic Bread", price: 5.99 },
+          { name: "Caesar Salad", price: 8.99 },
+          { name: "Four Cheese Pizza", price: 19.99 },
+          { name: "Mushroom Pizza", price: 17.99 },
+        ],
+        2: [
+          // Burger Barn
+          { name: "Classic Cheeseburger", price: 12.99 },
+          { name: "Bacon Deluxe Burger", price: 15.99 },
+          { name: "Veggie Burger", price: 11.99 },
+          { name: "Crispy Fries", price: 4.99 },
+          { name: "Chocolate Milkshake", price: 6.99 },
+        ],
+        3: [
+          // Tokyo Sushi Spot
+          { name: "California Roll", price: 8.99 },
+          { name: "Spicy Tuna Roll", price: 10.99 },
+          { name: "Salmon Nigiri", price: 6.99 },
+          { name: "Miso Soup", price: 3.99 },
+          { name: "Edamame", price: 5.99 },
+        ],
+        4: [
+          // Taco Fiesta
+          { name: "Beef Tacos (3pc)", price: 9.99 },
+          { name: "Chicken Quesadilla", price: 11.99 },
+          { name: "Guacamole & Chips", price: 7.99 },
+          { name: "Bean Burrito", price: 8.99 },
+          { name: "Horchata", price: 4.99 },
+        ],
+        5: [
+          // Parisian Bistro
+          { name: "Croque Monsieur", price: 14.99 },
+          { name: "French Onion Soup", price: 8.99 },
+          { name: "Steak Frites", price: 24.99 },
+          { name: "Crème Brûlée", price: 7.99 },
+          { name: "Escargot", price: 12.99 },
+        ],
+        6: [
+          // Dragon Garden
+          { name: "Kung Pao Chicken", price: 13.99 },
+          { name: "Beef with Broccoli", price: 14.99 },
+          { name: "Vegetable Lo Mein", price: 11.99 },
+          { name: "Spring Rolls (4pc)", price: 6.99 },
+          { name: "Hot & Sour Soup", price: 4.99 },
+        ],
+      };
+
+      // Real restaurant data with images and various locations
+      const restaurantData = [
+        {
+          id: 1,
+          name: "Mario's Pizza Palace",
+          cuisine_type: "Italian",
+          description:
+            "Authentic Italian pizzas made with fresh ingredients and traditional recipes. Family-owned since 1985.",
+          address: "123 Little Italy St, Manhattan, NY",
+          phone: "(555) 123-4567",
+          image:
+            "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop",
+          rating: 4.7,
+          deliveryTime: "25-35 min",
+        },
+        {
+          id: 2,
+          name: "Burger Barn",
+          cuisine_type: "American",
+          description:
+            "Juicy burgers, crispy fries, and amazing milkshakes. Best burgers in town since 1999.",
+          address: "456 Broadway Ave, Brooklyn, NY",
+          phone: "(555) 234-5678",
+          image:
+            "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=400&h=300&fit=crop",
+          rating: 4.5,
+          deliveryTime: "20-30 min",
+        },
+        {
+          id: 3,
+          name: "Tokyo Sushi Spot",
+          cuisine_type: "Japanese",
+          description:
+            "Fresh sushi and authentic Japanese cuisine prepared by master chefs from Tokyo.",
+          address: "789 Cherry Blossom Ln, Queens, NY",
+          phone: "(555) 345-6789",
+          image:
+            "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop",
+          rating: 4.8,
+          deliveryTime: "30-40 min",
+        },
+        {
+          id: 4,
+          name: "Taco Fiesta",
+          cuisine_type: "Mexican",
+          description:
+            "Mexican street food with a modern twist. Fresh ingredients and bold flavors.",
+          address: "321 Sunset Blvd, Bronx, NY",
+          phone: "(555) 456-7890",
+          image:
+            "https://images.unsplash.com/photo-1565299585323-38174c13fae8?w=400&h=300&fit=crop",
+          rating: 4.6,
+          deliveryTime: "15-25 min",
+        },
+        {
+          id: 5,
+          name: "Parisian Bistro",
+          cuisine_type: "French",
+          description:
+            "Elegant French cuisine in a cozy atmosphere. Perfect for romantic dinners.",
+          address: "654 Champs-Élysées St, Manhattan, NY",
+          phone: "(555) 567-8901",
+          image:
+            "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop",
+          rating: 4.9,
+          deliveryTime: "35-45 min",
+        },
+        {
+          id: 6,
+          name: "Dragon Garden",
+          cuisine_type: "Chinese",
+          description:
+            "Traditional Chinese dishes with authentic flavors from different regions of China.",
+          address: "987 Chinatown Rd, Manhattan, NY",
+          phone: "(555) 678-9012",
+          image:
+            "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop",
+          rating: 4.4,
+          deliveryTime: "25-35 min",
+        },
+      ];
+
+      // Initial login function
+      function initialLogin() {
+        const email = document.getElementById("initial-email").value;
+        const password = document.getElementById("initial-password").value;
+
+        if (!email || !password) {
+          alert("Please enter both email and password");
+          return;
+        }
+
+        // Extract name from email and capitalize it
+        const emailName = email.split("@")[0];
+        const formattedName = emailName
+          .split(".")
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ");
+
+        // Create user session
+        currentUser = {
+          name: formattedName,
+          email: email,
+          id: Date.now(),
+        };
+
+        // Hide login page and show main app
+        document.getElementById("login-page").style.display = "none";
+        document.getElementById("main-app").style.display = "block";
+
+        // Update UI
+        updateAuthUI();
+        loadRestaurants();
+
+        showMessage(`🎉 Welcome to QuickBite, ${currentUser.name}!`, "success");
+      }
+
+      // Restaurant functions
+      async function loadRestaurants() {
+        try {
+          showMessage("🔄 Loading restaurants...", "loading");
+
+          // Simulate API call delay
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          // Use our local restaurant data instead of API call
+          displayRestaurants(restaurantData);
+        } catch (error) {
+          showMessage("❌ Cannot load restaurants. Please try again.", "error");
+        }
+      }
+
+      function displayRestaurants(restaurants) {
+        const container = document.getElementById("restaurants");
+        displayedRestaurants.clear();
+
+        if (!restaurants || restaurants.length === 0) {
+          container.innerHTML =
+            '<div class="message">No restaurants found.</div>';
+          return;
+        }
+
+        let html = "";
+        let uniqueCount = 0;
+
+        restaurants.forEach((restaurant) => {
+          if (displayedRestaurants.has(restaurant.id)) return;
+
+          displayedRestaurants.add(restaurant.id);
+          uniqueCount++;
+
+          // FIX: Properly escape the restaurant name for JavaScript
+          const escapedName = restaurant.name.replace(/'/g, "\\'");
+
+          html += `
+            <div class="restaurant-card">
+              <img src="${restaurant.image}" alt="${restaurant.name}" class="restaurant-image" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop'">
+              <div class="restaurant-content">
+                <div class="restaurant-header">
+                  <h3>${restaurant.name}</h3>
+                  <div class="cuisine">${restaurant.cuisine_type}</div>
+                </div>
+                <p class="description">${restaurant.description}</p>
+                <div class="restaurant-details">
+                  <p class="details">📍 ${restaurant.address}</p>
+                  <p class="details">📞 ${restaurant.phone}</p>
+                  <p class="details">⭐ <span class="rating">${restaurant.rating}</span> • 🚴 ${restaurant.deliveryTime}</p>
+                </div>
+                <button class="btn-order logged-in" onclick="showRestaurantMenu(${restaurant.id}, '${escapedName}')">
+                  🍽️ View Menu & Order
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+
+        if (uniqueCount === 0) {
+          showMessage("No restaurants found.", "info");
+        } else {
+          document.getElementById("message").innerHTML = "";
+        }
+      }
+
+      // IMPROVED function to show restaurant menu
+      function showRestaurantMenu(restaurantId, restaurantName) {
+        console.log(
+          `Showing menu for restaurant ID: ${restaurantId}, Name: ${restaurantName}`
+        );
+
+        const menu = restaurantMenus[restaurantId];
+
+        if (!menu || menu.length === 0) {
+          showMessage(`❌ Menu not available for ${restaurantName}.`, "error");
+          console.error(`No menu found for restaurant ID: ${restaurantId}`);
+          return;
+        }
+
+        // Create modal container
+        const modalContainer = document.createElement("div");
+        modalContainer.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 2000;
+        `;
+
+        // Create menu content
+        let menuHTML = `
+          <div style="background: #2a2a2a; padding: 30px; border-radius: 15px; border: 3px solid #ff6b00; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #ff6b00; padding-bottom: 15px;">
+              <h2 style="color: #ff6b00; margin: 0;">${restaurantName}</h2>
+              <button id="close-menu-modal" style="background: none; border: none; color: #ff6b00; font-size: 1.5em; cursor: pointer; padding: 5px;">✕</button>
+            </div>
+            <h3 style="text-align: center; margin-bottom: 25px; color: #ffffff;">Menu</h3>
+            <div style="display: grid; gap: 15px;">
+        `;
+
+        // Add menu items
+        menu.forEach((item, index) => {
+          // FIX: Properly escape item names for JavaScript
+          const escapedItemName = item.name.replace(/'/g, "\\'");
+
+          menuHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #333; border-radius: 10px; border: 1px solid #444;">
+              <div style="flex: 1;">
+                <div style="font-weight: bold; color: white; font-size: 1.1em; margin-bottom: 5px;">${
+                  item.name
+                }</div>
+                <div style="color: #ff6b00; font-weight: bold; font-size: 1.2em;">$${item.price.toFixed(
+                  2
+                )}</div>
+              </div>
+              <button class="btn btn-small" onclick="addToCart('${escapedItemName}', ${
+            item.price
+          }, ${restaurantId})" style="margin-left: 15px;">
+                ➕ Add to Cart
+              </button>
+            </div>
+          `;
+        });
+
+        menuHTML += `
+            </div>
+            <div style="text-align: center; margin-top: 25px;">
+              <button class="btn btn-secondary" onclick="closeMenuModal()" style="margin-top: 15px;">
+                Close Menu
+              </button>
+            </div>
+          </div>
+        `;
+
+        modalContainer.innerHTML = menuHTML;
+        document.body.appendChild(modalContainer);
+
+        // Add event listener for close button
+        document
+          .getElementById("close-menu-modal")
+          .addEventListener("click", closeMenuModal);
+
+        // Close modal when clicking outside
+        modalContainer.addEventListener("click", function (event) {
+          if (event.target === modalContainer) {
+            closeMenuModal();
+          }
+        });
+      }
+
+      // Function to close menu modal
+      function closeMenuModal() {
+        const modal = document.querySelector(
+          'div[style*="position: fixed"][style*="z-index: 2000"]'
+        );
+        if (modal) {
+          modal.remove();
+        }
+      }
+
+      // UPDATED addToCart function with better error handling
+      function addToCart(itemName, price, restaurantId) {
+        if (!currentUser) {
+          showMessage("❌ Please login first to add items to cart", "error");
+          return;
+        }
+
+        // Check if item already exists in cart
+        const existingItemIndex = cart.findIndex(
+          (item) => item.name === itemName && item.restaurantId === restaurantId
+        );
+
+        if (existingItemIndex > -1) {
+          // Increase quantity if item already exists
+          cart[existingItemIndex].quantity += 1;
+          showMessage(
+            `🎉 Added another ${itemName} to cart! (Total: ${cart[existingItemIndex].quantity})`,
+            "success"
+          );
+        } else {
+          // Add new item to cart
+          cart.push({
+            name: itemName,
+            price: price,
+            quantity: 1,
+            restaurantId: restaurantId,
+            id: Date.now() + Math.random(),
+          });
+          showMessage(`🎉 Added ${itemName} to cart!`, "success");
+        }
+
+        updateCartDisplay();
+
+        // Close menu modal after adding to cart
+        closeMenuModal();
+      }
+
+      function removeFromCart(itemId) {
+        cart = cart.filter((item) => item.id !== itemId);
+        updateCartDisplay();
+        showMessage("Item removed from cart", "success");
+      }
+
+      function updateQuantity(itemId, change) {
+        const itemIndex = cart.findIndex((item) => item.id === itemId);
+        if (itemIndex > -1) {
+          cart[itemIndex].quantity += change;
+
+          // Remove item if quantity becomes 0 or less
+          if (cart[itemIndex].quantity <= 0) {
+            cart.splice(itemIndex, 1);
+            showMessage("Item removed from cart", "success");
+          }
+
+          updateCartDisplay();
+        }
+      }
+
+      function clearCart() {
+        if (cart.length === 0) {
+          showMessage("Your cart is already empty!", "info");
+          return;
+        }
+
+        if (confirm("Are you sure you want to clear your entire cart?")) {
+          cart = [];
+          updateCartDisplay();
+          showMessage("Cart cleared successfully", "success");
+        }
+      }
+
+      function updateCartDisplay() {
+        const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById("cart-count").textContent = cartCount;
+        document.getElementById("cart-count-nav").textContent = cartCount;
+
+        const cartItems = document.getElementById("cart-items");
+        const cartTotal = document.getElementById("cart-total");
+
+        if (cart.length === 0) {
+          cartItems.innerHTML = `
+            <div class="empty-cart">
+              <div style="font-size: 3em; margin-bottom: 20px;">🛒</div>
+              <h3>Your cart is empty</h3>
+              <p style="color: #cccccc; margin-top: 10px;">Add some delicious items to get started!</p>
+            </div>
+          `;
+          cartTotal.textContent = "Total: $0.00";
+          return;
+        }
+
+        let itemsHTML = "";
+        let total = 0;
+
+        cart.forEach((item) => {
+          const itemTotal = item.price * item.quantity;
+          total += itemTotal;
+          itemsHTML += `
+            <div class="cart-item">
+              <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">$${item.price.toFixed(
+                  2
+                )} each</div>
+              </div>
+              <div class="cart-item-controls">
+                <div class="quantity-controls">
+                  <button class="quantity-btn" onclick="updateQuantity(${
+                    item.id
+                  }, -1)">-</button>
+                  <span class="quantity-display">${item.quantity}</span>
+                  <button class="quantity-btn" onclick="updateQuantity(${
+                    item.id
+                  }, 1)">+</button>
+                </div>
+                <button class="remove-btn" onclick="removeFromCart(${item.id})">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        cartItems.innerHTML = itemsHTML;
+        cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+      }
+
+      // User authentication functions
+      function updateAuthUI() {
+        const userName = document.getElementById("user-name");
+        if (currentUser) {
+          userName.textContent = `Hello, ${currentUser.name}!`;
+        }
+      }
+
+      function logout() {
+        currentUser = null;
+        cart = [];
+        updateCartDisplay();
+
+        // Show login page and hide main app
+        document.getElementById("login-page").style.display = "flex";
+        document.getElementById("main-app").style.display = "none";
+
+        // Clear login form
+        document.getElementById("initial-email").value = "";
+        document.getElementById("initial-password").value = "";
+      }
+
+      function showCart() {
+        document.getElementById("cart-modal").style.display = "flex";
+        updateCartDisplay();
+      }
+
+      function hideCart() {
+        document.getElementById("cart-modal").style.display = "none";
+      }
+
+      function showCheckout() {
+        if (cart.length === 0) {
+          showMessage("Your cart is empty!", "error");
+          return;
+        }
+
+        // Calculate total and update payment amount
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        document.getElementById(
+          "payment-amount"
+        ).textContent = `$${total.toFixed(2)}`;
+
+        // Pre-fill email with user's email
+        document.getElementById("confirm-email").value = currentUser.email;
+
+        hideCart();
+        document.getElementById("checkout-modal").style.display = "flex";
+      }
+
+      function hideCheckout() {
+        document.getElementById("checkout-modal").style.display = "none";
+      }
+
+      function completeOrder() {
+        const confirmEmail = document.getElementById("confirm-email").value;
+
+        if (!confirmEmail) {
+          alert("Please enter your email for order confirmation");
+          return;
+        }
+
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        // Create order summary
+        let orderSummary = "Order Details:\n";
+        cart.forEach((item) => {
+          orderSummary += `• ${item.name} x${item.quantity} - $${(
+            item.price * item.quantity
+          ).toFixed(2)}\n`;
+        });
+        orderSummary += `\nTotal: $${total.toFixed(2)}`;
+
+        // Simulate sending confirmation email
+        setTimeout(() => {
+          alert(
+            `📧 Order confirmation sent to: ${confirmEmail}\n\n${orderSummary}\n\n💰 M-Pesa: 2547 123 456 789\n\nThank you for your order, ${currentUser.name}!`
+          );
+        }, 1000);
+
+        // Clear cart and close modals
+        cart = [];
+        updateCartDisplay();
+        hideCheckout();
+
+        showMessage(
+          `🎉 Order confirmed! Confirmation sent to ${confirmEmail}`,
+          "success"
+        );
+      }
+
+      // Utility functions
+      function showMessage(text, type = "info") {
+        const messageDiv = document.getElementById("message");
+        messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+
+        if (type === "success") {
+          setTimeout(() => {
+            messageDiv.innerHTML = "";
+          }, 5000);
+        }
+      }
+
+      // Close modals when clicking outside
+      window.onclick = function (event) {
+        const cartModal = document.getElementById("cart-modal");
+        const checkoutModal = document.getElementById("checkout-modal");
+
+        if (event.target === cartModal) {
+          hideCart();
+        }
+        if (event.target === checkoutModal) {
+          hideCheckout();
+        }
+      };
+
+      // Initialize the app
+      document.addEventListener("DOMContentLoaded", function () {
+        // App starts with login page visible
+        updateAuthUI();
+      });
+    </script>
+  </body>
+</html>
